@@ -1,0 +1,20 @@
+{
+  "name": "omniscient",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "yarn@4.5.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach --all --topological-dev --exclude omniscient run build",
+    "test": "yarn workspace @omniscient/backend test",
+    "dev:web": "yarn workspace @omniscient/web dev",
+    "dev:backend": "yarn workspace @omniscient/backend start:dev",
+    "lint": "yarn workspaces foreach --all --exclude omniscient run lint"
+  },
+  "engines": {
+    "node": ">=20.10"
+  }
+}

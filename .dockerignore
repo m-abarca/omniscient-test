@@ -1,0 +1,31 @@
+# node_modules en todos los workspaces
+**/node_modules
+
+# Cache de Yarn 4 (enorme, se regenera en yarn install)
+.yarn/cache
+.yarn/install-state.gz
+.yarn/unplugged
+
+# Artefactos de build
+**/dist
+**/.next
+**/coverage
+**/.turbo
+
+# Archivos solo locales
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Los datos runtime de Directus NUNCA deben quedar dentro de las imágenes
+apps/directus/data
+
+# Docs (no van en las imágenes)
+README.md
+LICENSE

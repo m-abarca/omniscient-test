@@ -1,0 +1,118 @@
+{
+  "collection": "production_orders",
+  "meta": {
+    "icon": "factory",
+    "note": "Mini Production Orders System",
+    "sort_field": "createdAt",
+    "archive_field": null,
+    "archive_value": null,
+    "unarchive_value": null,
+    "singleton": false,
+    "hidden": false,
+    "display_template": "{{reference}} – {{product}}"
+  },
+  "schema": { "name": "production_orders" },
+  "fields": [
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": {
+        "interface": "input",
+        "readonly": true,
+        "hidden": true,
+        "special": ["uuid"],
+        "width": "half"
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": false,
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "reference",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "required": true,
+        "width": "half",
+        "options": { "placeholder": "ORD-001" }
+      },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "product",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "required": true,
+        "width": "half",
+        "options": { "placeholder": "Widget" }
+      },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "quantity",
+      "type": "integer",
+      "meta": {
+        "interface": "input",
+        "required": true,
+        "width": "half",
+        "options": { "min": 1 }
+      },
+      "schema": { "is_nullable": false, "default_value": 1 }
+    },
+    {
+      "field": "startDate",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "required": true,
+        "width": "half",
+        "display": "datetime"
+      },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "endDate",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "required": true,
+        "width": "half",
+        "display": "datetime"
+      },
+      "schema": { "is_nullable": false }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "required": true,
+        "width": "half",
+        "options": {
+          "choices": [
+            { "text": "Planned", "value": "planned" },
+            { "text": "Scheduled", "value": "scheduled" },
+            { "text": "In Progress", "value": "in_progress" },
+            { "text": "Completed", "value": "completed" }
+          ]
+        }
+      },
+      "schema": { "is_nullable": false, "default_value": "planned" }
+    },
+    {
+      "field": "createdAt",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "special": ["date-created"],
+        "width": "half",
+        "display": "datetime"
+      },
+      "schema": {}
+    }
+  ]
+}

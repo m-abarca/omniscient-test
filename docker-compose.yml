@@ -1,0 +1,78 @@
+services:
+  directus:
+    image: docker.io/directus/directus:11.1.2
+    restart: unless-stopped
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      DB_CLIENT: sqlite3
+      DB_FILENAME: /directus/database/data.db
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      WEBSOCKETS_ENABLED: "false"
+      CACHE_ENABLED: "false"
+      TELEMETRY: "false"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+    volumes:
+      # Volumen nombrado para la base SQLite (persistencia entre `down` y `up`).
+      - directus-data:/directus/database
+    ports:
+      - "8055:8055"
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "wget --no-verbose --tries=1 --spider http://localhost:8055/server/health || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  directus-init:
+    image: docker.io/library/alpine:3.19
+    depends_on:
+      directus:
+        condition: service_healthy
+    environment:
+      DIRECTUS_URL: http://directus:8055
+      DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+    volumes:
+      - ./apps/directus/init.sh:/init/init.sh:ro
+      - ./apps/directus/collection.json:/init/collection.json:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["apk add --no-cache curl jq >/dev/null && sh /init/init.sh"]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    depends_on:
+      directus-init:
+        condition: service_completed_successfully
+    environment:
+      BACKEND_PORT: "3001"
+      DIRECTUS_URL: http://directus:8055
+      DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  directus-data:
